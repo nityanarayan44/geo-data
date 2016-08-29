@@ -1,0 +1,183 @@
+<!--
+@Author: Ashutosh mishra
+@Date: 10 August 2016
+@Desc: Records letitude and longitude using device geolocation, and shows pattern.
+@Used: Javascript, bootstrap
+
+@License: OpenSource MIT License
+	Anyone can [Clone, Improve, Distribute]
+
+@Perpose: Educational/Learning
+-->
+<!DOCTYPE HTML>
+<HTML>
+	<head>
+		<meta charset="utf-8">
+		<link rel="shortcut icon" href="./favicon.png">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- Core CSS -->
+		<link href="data/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+		<script src="data/jquery-3.1.0.min.js"></script>
+		<script src="data/bootstrap/js/bootstrap.min.js"></script>
+		<link href="data/font-awesome.min.css" rel="stylesheet">
+
+		<title>GEO-LOCATION</title>
+	</head>
+	<body bgcolor="#aaccaa">
+		<!--  FIXED HEADER WITH MENUs AND ICON -->
+		<header id="header-1">
+			<nav class="main-nav navbar navbar-default navbar-fixed-top">
+				<div class="container">
+					<!-- Brand and toggle get grouped for better mobile display -->
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<h2>GEO DATA</h2>
+						<!--<img src="" class="brand-img img-responsive" style="border-radius: 0px; border: 1px none rgb(51, 51, 51);"/>-->
+					</div>
+
+					<!-- Collect the nav links, forms, and other content for toggling -->
+					<div class="collapse navbar-collapse" id="navbar-collapse">
+						<ul class="nav navbar-nav navbar-right">
+							<li class="nav-item dropdown">
+								<a class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="0" data-close-others="false" href="#">Other <i class="fa fa-angle-down"></i></a>
+								<ul class="dropdown-menu">
+					                                <li><a href="#" target="_blank">Opt1</a></li>
+					                                <li><a href="#">Opt2</a></li>
+					                                <li><a href="#">Opt3</a></li>
+								</ul>
+							</li><!-- /.dropdown -->
+	                        			<li class="nav-item"><a href="#">Application-1</a></li>
+							<li class="nav-item"><a href="#">Application-2</a></li>
+	                        			<li class="nav-item"><a href="mailto:nityanarayan44@live.com">Feedback</a></li>
+						</ul>
+					</div><!-- /.navbar-collapse -->
+				</div><!-- /.container-fluid -->
+			</nav>
+		</header>
+
+		<br/><br/><br/><br/>
+		<div id="page-area" style="position:relative; background-color=#aaccaa;">
+			<center>
+				<div class="container">
+
+					<div class="row">
+				                <div class="col-sm-4 col-xs-12 content">
+							<div class="jumbotron">
+								<!-- LATITUDE -->
+								<h2><b>LATITUDE:</b> <h2 id="lat"></h2></h2>
+							</div>
+				                </div>
+						<div class="col-sm-4 col-xs-12 content">
+							<div class="jumbotron">
+								<!-- LONGITUDE -->
+								<h2> <b>LONGITUDE:</b> <h2 id="lng"></h2></h2>
+							</div>
+				                </div>
+						<div class="col-sm-4 col-xs-12 content">
+							<div class="jumbotron">
+								<!-- HOPs or Node visited -->
+								<h2> <b>Point Visited:</b> <h2 id="hops"></h2></h2>
+							</div>
+				                </div>
+				        </div><!-- /.row-->
+
+					<div class="row">
+	    			                <div class="col-sm-12 col-xs-12 content">
+	    						<div class="jumbotron">
+	    							<h2 align="left">PATTERN</h2>
+								<canvas id="myCanvas" height="100" style="border:1px solid darkred;">
+								Your browser does not support the canvas element.
+								</canvas>
+	    						</div>
+	    			                </div>
+					</div>
+
+			        </div><!-- /.container -->
+			</center>
+		</div>
+
+		<script>
+			var x = document.getElementById("error");
+			var lat = "";
+			var lng = "";
+			var hops = 0;
+			var latlon = "";
+			var old = "";
+
+			//pattern printing.
+			var canvas = document.getElementById("myCanvas");
+			var ctx = canvas.getContext("2d");
+
+			/* Get location data [lat, lng]*/
+			function getLocation() {
+			    if (navigator.geolocation) {
+				//console.log("Getting your lat, lon Data...");
+				navigator.geolocation.getCurrentPosition(showPosition, showError);
+			    } else {
+				x.innerHTML = "<h3>Geolocation is not supported by this browser.</h3>";
+			    }
+			}
+
+			/* Print location data [lat, lng]*/
+			function showPosition(position) {
+				lat = position.coords.latitude ;
+				lng = position.coords.longitude;
+				latlon = position.coords.latitude + "," + position.coords.longitude ;
+
+			    	//var img_url = "http://maps.googleapis.com/maps/api/staticmap?center="+latlon+"&zoom=14&size=400x300&sensor=false";
+			    	//document.getElementById("mapholder").innerHTML = "<img src='"+img_url+"'>";
+
+			    if(old !== latlon){
+				hops ++;
+				document.getElementById("lat").innerText = lat;
+				document.getElementById("lng").innerText = lng;
+				document.getElementById("hops").innerText = hops;
+
+				//placing a circle
+				ctx.beginPath();
+				ctx.arc(lat,lng,2,0,2*Math.PI);
+				ctx.stroke();
+
+			    }else{
+				//console.log("No movement, Same location....");
+			    }
+				old = latlon;
+
+			    //Automating for every 30 second.
+			    setInterval(getLocation, 30000);
+			}
+
+			/*Error notification.*/
+			function showError(error) {
+			    switch(error.code) {
+				case error.PERMISSION_DENIED:
+				    x.innerHTML = "User denied the request for Geolocation."
+				    break;
+				case error.POSITION_UNAVAILABLE:
+				    x.innerHTML = "Location information is unavailable."
+				    break;
+				case error.TIMEOUT:
+				    x.innerHTML = "The request to get user location timed out."
+				    break;
+				case error.UNKNOWN_ERROR:
+				    x.innerHTML = "An unknown error occurred."
+				    break;
+			    }
+			}
+
+			//auto start;
+			getLocation();
+		</script>
+
+	</body>
+</HTML>
+<style>
+	body{
+		background-color:#aaccaa;
+	}
+</style>
